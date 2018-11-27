@@ -91,18 +91,18 @@ if __name__ == '__main__':
     parser.add_argument(
         '--datafile',
         type=str,
-        default='dataset/gridworld_8x8.npz',
+        default='dataset/gridworld_16x16.npz',
         help='Path to data file')
-    parser.add_argument('--imsize', type=int, default=8, help='Size of image')
+    parser.add_argument('--imsize', type=int, default=16, help='Size of image')
     parser.add_argument(
         '--lr',
         type=float,
-        default=0.005,
+        default=0.002,
         help='Learning rate, [0.01, 0.005, 0.002, 0.001]')
     parser.add_argument(
         '--epochs', type=int, default=30, help='Number of epochs to train')
     parser.add_argument(
-        '--k', type=int, default=10, help='Number of Value Iterations')
+        '--k', type=int, default=20, help='Number of Value Iterations')
     parser.add_argument(
         '--l_i', type=int, default=2, help='Number of channels in input layer')
     parser.add_argument(
