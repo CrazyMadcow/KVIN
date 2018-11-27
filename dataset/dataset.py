@@ -37,7 +37,7 @@ class GridworldData(data.Dataset):
         # Set proper datatypes
         s1 = s1.astype(np.float32)  # (S1, S2) are float
         s2 = s2.astype(np.float32)
-        label = label.astype(np.float32)  # labels are float
+        label = label.astype(np.float32)  # labels are long
         return img, s1, s2, label
 
     def __len__(self):

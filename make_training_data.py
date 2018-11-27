@@ -27,7 +27,6 @@ def make_data(dom_size,n_domains):
         pix = np.array(grid)
 
         # Read simulation data
-
         mat_path = 'data\\scenario_states\\Gen' + str(scenario_num) + '.mat'
         Scenario = io.loadmat(mat_path)
         X = np.array(Scenario['X'])

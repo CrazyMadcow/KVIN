@@ -57,22 +57,32 @@ class VIN(nn.Module):
             torch.cat([self.q.weight, self.w], 1),
             stride=1,
             padding=1)
-        S1 = S1.view(S1.size(0))
-        S2 = S2.view(S2.size(0))
-        S_grid=np.zeros(S1.size())
 
-        for i in range(S1.size()):
+        S1 = S1.squeeze(1)
+        S2 = S2.squeeze(1)
+        S1_grid = torch.zeros(S1.size())
+        S2_grid = torch.zeros(S2.size())
+
+        for i in range(S1.size(0)):
             for j in range(16):
-                if ((-50+6.25*i)<S1[i]) and (S[i]<-50+6.25*(i+1)):
-                    S_grid[i]=j
+                if ((-50+6.25*j)<S1[i]) and (S1[i]<-50+6.25*(j+1)):
+                    S1_grid[i]=j
 
-        print(S_grid)
+        for i in range(S2.size(0)):
+            for j in range(16):
+                if ((-50+6.25*j)<S2[i]) and (S2[i]<-50+6.25*(j+1)):
+                    S2_grid[i]=j
 
-        slice_s1 = S1.long().expand(config.imsize, 1, config.l_q, q.size(0))
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        S1_grid = S1_grid.to(device)
+        S2_grid = S2_grid.to(device)
+
+        slice_s1 = S1_grid.long().expand(config.imsize, 1, config.l_q, q.size(0))
         slice_s1 = slice_s1.permute(3, 2, 1, 0)
         q_out = q.gather(2, slice_s1).squeeze(2)
 
-        slice_s2 = S2.long().expand(1, config.l_q, q.size(0))#S2.long().expand(1, config.l_q, q.size(0))
+        slice_s2 = S2_grid.long().expand(1, config.l_q, q.size(0))#S2.long().expand(1, config.l_q, q.size(0))
         slice_s2 = slice_s2.permute(2, 1, 0)
         q_out = q_out.gather(2, slice_s2).squeeze(2)
 
