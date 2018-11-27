@@ -57,12 +57,14 @@ class VIN(nn.Module):
             torch.cat([self.q.weight, self.w], 1),
             stride=1,
             padding=1)
+        S1 = S1.view(S1.size(0))
+        S2 = S2.view(S2.size(0))
 
-        slice_s1 = S1.expand(config.imsize, 1, config.l_q, q.size(0))
+        slice_s1 = S1.long().expand(config.imsize, 1, config.l_q, q.size(0))
         slice_s1 = slice_s1.permute(3, 2, 1, 0)
         q_out = q.gather(2, slice_s1).squeeze(2)
 
-        slice_s2 = S2.expand(1, config.l_q, q.size(0))#S2.long().expand(1, config.l_q, q.size(0))
+        slice_s2 = S2.long().expand(1, config.l_q, q.size(0))#S2.long().expand(1, config.l_q, q.size(0))
         slice_s2 = slice_s2.permute(2, 1, 0)
         q_out = q_out.gather(2, slice_s2).squeeze(2)
 
