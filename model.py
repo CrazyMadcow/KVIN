@@ -59,6 +59,14 @@ class VIN(nn.Module):
             padding=1)
         S1 = S1.view(S1.size(0))
         S2 = S2.view(S2.size(0))
+        S_grid=np.zeros(S1.size())
+
+        for i in range(S1.size()):
+            for j in range(16):
+                if ((-50+6.25*i)<S1[i]) and (S[i]<-50+6.25*(i+1)):
+                    S_grid[i]=j
+
+        print(S_grid)
 
         slice_s1 = S1.long().expand(config.imsize, 1, config.l_q, q.size(0))
         slice_s1 = slice_s1.permute(3, 2, 1, 0)
