@@ -38,8 +38,10 @@ def train(net, trainloader, config, criterion, optimizer):
             optimizer.zero_grad()
             # Forward pass
             outputs, predictions = net(X, S1, S2, config)
+            labels = labels.squeeze(1)
+            labels = labels.squeeze(1)
             # Loss
-            loss = criterion(outputs, labels)
+            loss = criterion(outputs, labels.long())
             # Backward pass
             loss.backward()
             # Update params
@@ -78,6 +80,8 @@ def test(net, testloader, config):
         # Unwrap autograd.Variable to Tensor
         predicted = predicted.data
         # Compute test accuracy
+        labels = labels.squeeze(1)
+        labels = labels.squeeze(1)
         correct += (torch.eq(torch.squeeze(predicted), labels)).sum()
         total += labels.size()[0]
     print('Test Accuracy: {:.2f}%'.format(100 * (correct / total)))

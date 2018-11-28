@@ -31,7 +31,7 @@ def make_data(dom_size,n_domains):
         Scenario = io.loadmat(mat_path)
         X = np.array(Scenario['X'])
         Y = np.array(Scenario['Y'])
-        acc = np.array(Scenario['acc'])
+        acc = 1000*np.array(Scenario['acc'])
         ns = X.shape[0] - 1
 
 
