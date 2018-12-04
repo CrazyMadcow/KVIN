@@ -37,7 +37,7 @@ def main(config,
     for dom in range(n_domains):
         # Randomly select goal position
         # find goal
-        goal_path = 'data\\scenarios_grid\\Scenario_goal' + str(5) + '.png'
+        goal_path = 'data\\scenarios_grid\\Scenario_goal' + str(7) + '.png'
 
         goal_grid = pilimg.open(goal_path)
         goal_grid = goal_grid.convert('L')
@@ -48,7 +48,7 @@ def main(config,
                     goal_index = np.array([i, j])
         goal = [40, 40]
         # Generate obstacle map
-        grid_path = 'data\\scenarios_grid\\Scenario_' + str(5) + '_grid.png'
+        grid_path = 'data\\scenarios_grid\\Scenario_' + str(7) + '_grid.png'
 
         grid = pilimg.open(grid_path)
         grid = grid.convert('L')
@@ -90,7 +90,7 @@ def main(config,
         # Sample random trajectories to our goal
         # Read simulation data
 
-        mat_path = 'data\\scenario_states\\Gen' + str(5) + '.mat'
+        mat_path = 'data\\scenario_states\\Gen' + str(7) + '.mat'
         Scenario = io.loadmat(mat_path)
         X = np.array(Scenario['X'])
         Y = np.array(Scenario['Y'])
@@ -201,6 +201,10 @@ def get_next_states(s, gamma, a):
     y = y + 0.25 * math.sin(gamma) * dT
 
     gamma = gamma + (a / 0.25) * dT
+    if gamma>2*math.pi:
+        gamma=gamma-2*math.pi
+    if gamma<-2*math.pi:
+        gamma = gamma + 2 * math.pi
     ns = np.array([x, y])
     return ns, gamma
 

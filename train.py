@@ -82,7 +82,7 @@ def test(net, testloader, config):
         # Compute test accuracy
         labels = labels.squeeze(1)
         labels = labels.squeeze(1)
-        correct += (torch.eq(torch.squeeze(predicted), labels)).sum()
+        correct += (torch.eq(torch.squeeze(predicted), labels.long())).sum()
         total += labels.size()[0]
     print('Test Accuracy: {:.2f}%'.format(100 * (correct / total)))
 

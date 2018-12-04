@@ -17,29 +17,37 @@ from model import *
 
 
 
-def train(net, trainloader, config, criterion, optimizer):
+def train(net, trainloader, config, criterion, optimizer,testloader):
     print_header()
     for epoch in range(config.epochs):  # Loop over dataset multiple times
         avg_error, avg_loss, num_batches = 0.0, 0.0, 0.0
         start_time = time.time()
+        net = net.cuda()
+        #test(net, testloader, config)
         for i, data in enumerate(trainloader):  # Loop over batches of data
             # Get input batch
-            X, S1, S2, labels = data
+            X, S1, S2, gamma, labels = data
             if X.size()[0] != config.batch_size:
                 continue  # Drop those data, if not enough for a batch
             #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
             X = X.cuda()
             S1 = S1.cuda()
             S2 = S2.cuda()
+            gamma = gamma.cuda()
             labels = labels.cuda()
-            net = net.cuda()
+
+            #S1=S1.view(-1,1)
+            #S2 = S2.view(-1, 1)
+
+
             # Wrap to autograd.Variable
             X, S1 = Variable(X), Variable(S1)
             S2, labels = Variable(S2), Variable(labels)
+            gamma = Variable(gamma)
             # Zero the parameter gradients
             optimizer.zero_grad()
             # Forward pass
-            outputs = net(X, S1, S2, config)
+            outputs = net(X, S1, S2, gamma, config)
 
 
             # Loss
@@ -55,8 +63,11 @@ def train(net, trainloader, config, criterion, optimizer):
             loss_batch, error_batch = get_stats(loss, outputs, labels)
             avg_loss += loss_batch
             avg_error += error_batch
+            #print(loss)
+            #print(error_batch)
             num_batches += 1
         time_duration = time.time() - start_time
+        test(net, testloader, config)
         # Print epoch logs
         print_stats(epoch, avg_loss, avg_error, num_batches, time_duration)
     print('\nFinished training. \n')
@@ -65,26 +76,28 @@ def train(net, trainloader, config, criterion, optimizer):
 def test(net, testloader, config):
     total, correct = 0.0, 0.0
     for i, data in enumerate(testloader):
+        if i==1000:
+            break
         # Get inputs
-        X, S1, S2, labels = data
+        X, S1, S2, gamma, labels = data
         if X.size()[0] != config.batch_size:
             continue  # Drop those data, if not enough for a batch
         # automaticlly select device, device agnostic
         X = X.cuda()
         S1 = S1.cuda()
         S2 = S2.cuda()
+        gamma = gamma.cuda()
         labels = labels.cuda()
         net = net.cuda()
         # Wrap to autograd.Variable
-        X, S1, S2 = Variable(X), Variable(S1), Variable(S2)
+        X, S1, S2, gamma = Variable(X), Variable(S1), Variable(S2), Variable(gamma)
         # Forward pass
-        outputs = net(X, S1, S2, config)
+        outputs = net(X, S1, S2, gamma, config)
         # Select actions with max scores(logits)
         # Unwrap autograd.Variable to Tensor
-        predicted = outputs
 
         # Compute test accuracy
-        correct += (torch.eq(torch.squeeze(predicted), labels)).sum()
+        correct += abs(outputs.cpu().data.numpy() - labels.cpu().data.squeeze(1).numpy()).sum()
         total += labels.size()[0]
     print('Test Accuracy: {:.2f}%'.format(100 * (correct / total)))
 
@@ -149,7 +162,7 @@ if __name__ == '__main__':
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=config.batch_size, shuffle=False, num_workers=0)
     # Train the model
-    train(net, trainloader, config, criterion, optimizer)
+    train(net, trainloader, config, criterion, optimizer,testloader)
     # Test accuracy
     test(net, testloader, config)
     # Save the trained model parameters

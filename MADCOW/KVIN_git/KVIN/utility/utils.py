@@ -16,9 +16,8 @@ def fmt_item(x, l):
     return " " * (l - len(rep)) + rep
 
 
-def get_stats(loss, predictions, labels):
-    cp = np.argmax(predictions.cpu().data.numpy(), 1)
-    error = np.mean(cp != labels.cpu().data.numpy())
+def get_stats(loss, outputs, labels):
+    error = np.mean(abs(outputs.cpu().data.numpy() - labels.cpu().data.squeeze(1).numpy()))
     return loss.item(), error#loss.data[0], error
 
 

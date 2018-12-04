@@ -9,6 +9,7 @@ def make_data(dom_size,n_domains):
     X_l=[]
     S1_l=[]
     S2_l=[]
+    gamma_l=[]
     Labels_l=[]
 
     for k in n_domains:
@@ -31,6 +32,7 @@ def make_data(dom_size,n_domains):
         Scenario = io.loadmat(mat_path)
         X = np.array(Scenario['X'])
         Y = np.array(Scenario['Y'])
+        gamma= np.array(Scenario['gamma'])
         acc = np.array(Scenario['acc'])
         ns = X.shape[0] - 1
 
@@ -83,34 +85,37 @@ def make_data(dom_size,n_domains):
         X_current = np.tile(iv_mixed, (ns, 1, 1, 1))
         S1_current = np.expand_dims(X[0:ns, 0], axis=1)
         S2_current = np.expand_dims(Y[0:ns, 0], axis=1)
+        gamma_current = np.expand_dims(gamma[0:ns, 0], axis=1)
         Labels_current = np.expand_dims(acc, axis=1)
 
         X_l.append(X_current)
         S1_l.append(S1_current)
         S2_l.append(S2_current)
+        gamma_l.append(gamma_current)
         Labels_l.append(Labels_current)
 
     X_f = np.concatenate(X_l)
     S1_f = np.concatenate(S1_l)
     S2_f = np.concatenate(S2_l)
+    gamma_f = np.concatenate(gamma_l)
     Labels_f = np.concatenate(Labels_l)
 
-    return X_f, S1_f, S2_f, Labels_f
+    return X_f, S1_f, S2_f, gamma_f, Labels_f
 
 
 print("\nNow making  training data...")
 dom_size = np.array([16, 16])
-training_n_domains=[5,6,7]
-X_out_tr, S1_out_tr, S2_out_tr, Labels_out_tr = make_data(dom_size, training_n_domains)
+training_n_domains=[1,2,3,4,5,6,7,8,9,10]
+X_out_tr, S1_out_tr, S2_out_tr, gamma_out_tr, Labels_out_tr = make_data(dom_size, training_n_domains)
 sys.stdout.write("\nThe " + str(X_out_tr.shape[0]) + " of training data was generated\n\n")
 
 print("\nNow making  testing data...")
 test_n_domains=[10]
-X_out_ts, S1_out_ts, S2_out_ts, Labels_out_ts = make_data(dom_size, test_n_domains)
+X_out_ts, S1_out_ts, S2_out_ts,gamma_out_ts,Labels_out_ts = make_data(dom_size, test_n_domains)
 sys.stdout.write("\nThe " + str(X_out_ts.shape[0]) + " of training data was generated\n\n")
 
 print("\nNow saving dataset...")
 save_path = "dataset/gridworld_{0}x{1}".format(dom_size[0], dom_size[1])
-np.savez_compressed(save_path, X_out_tr, S1_out_tr, S2_out_tr,Labels_out_tr, X_out_ts, S1_out_ts, S2_out_ts,Labels_out_ts)
+np.savez_compressed(save_path, X_out_tr, S1_out_tr, S2_out_tr,gamma_out_tr,Labels_out_tr, X_out_ts, S1_out_ts, S2_out_ts,gamma_out_ts,Labels_out_ts)
 print("\ndataset saved")
 
